@@ -1,0 +1,5 @@
+- hosts: My_Group
+  become: yes
+  roles:
+#    - { role: docker }
+    - { role: jenkins }

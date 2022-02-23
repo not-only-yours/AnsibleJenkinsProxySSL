@@ -1,0 +1,15 @@
+- name: installisation
+  apt:
+    name:
+      - certbot
+
+
+- name: generation of serts
+  shell: certbot certonly --standalone -d nikitasdomain.tk --staple-ocsp -m darty@nikitasdomain.tk --agree-tos
+#
+#- name: check file
+#  stat:
+#    path: /etc/letsencrypt/live/nikitasdomain.tk
+#    register: serts
+
+
