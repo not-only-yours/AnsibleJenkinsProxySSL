@@ -1,0 +1,4 @@
+- name: pull jenkins image
+  docker_image:
+    name: jenkins/jenkins:2.335-alpine
+    source: pull

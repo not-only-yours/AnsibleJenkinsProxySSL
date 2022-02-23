@@ -1,0 +1,23 @@
+- name: create folder jenkinsVol
+  ansible.builtin.file:
+    path: /opt/jenkinsVol
+    owner: 1000
+    group: 1000
+    state: directory
+    mode: '0755'
+
+- name: Create a network
+  docker_network:
+    name: "proxy"
+
+- name: create a container from ther jenkins docker image
+  docker_container:
+    name: "jenkins"
+    image: "jenkins/jenkins:2.335-alpine"
+    volumes:
+      - /opt/jenkinsVol:/var/jenkins_home
+    state: started
+    detach: yes
+    networks:
+      - name: "proxy"
+

@@ -1,0 +1,14 @@
+- name: install nginx
+  apt: name=nginx update_cache=yes
+
+- name: copy nginx config file
+  copy: src=/Users/nikita_dir/Documents/projects/NikitaAnsible/roles/jenkins/files/vhost.conf dest=/etc/nginx/sites-available/default
+
+- name: enable configuration
+  file: >
+    dest=/etc/nginx/sites-enabled/default
+    src=/etc/nginx/sites-available/default
+    state=link
+
+- name: restart nginx
+  service: name=nginx state=restarted
