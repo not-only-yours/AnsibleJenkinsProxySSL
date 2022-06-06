@@ -1,0 +1,23 @@
+- name: Installing transport-https
+  apt:
+    name: apt-transport-https
+    state: present
+    update_cache: yes
+
+- name: Installing virtualbox
+  apt:
+    name: virtualbox
+    state: present
+
+- name: Download minikube
+  get_url:
+    url: https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
+    dest: /usr/local/bin
+    mode: '0755'
+
+
+- name: create alias
+  script: alias kubectl="minikube-linux-amd64 kubectl --"
+
+- name: run minikube
+  script: minikube-linux-amd64 start

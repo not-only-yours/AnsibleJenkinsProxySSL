@@ -1,0 +1,4 @@
+---
+# tasks file for kuber
+- include_tasks: minicubeInstall.yaml
+- include_tasks: kubectlInstall.yaml

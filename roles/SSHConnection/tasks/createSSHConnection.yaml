@@ -1,0 +1,27 @@
+- name: generate SSH key "id_rsa_videoChat"
+  openssh_keypair:
+    path: "/home/ubuntu/.ssh/id_rsa_videoChat"
+    type: rsa
+    size: 4096
+    state: present
+    force: no
+  when:
+    - inventory_hostname in groups['My_Group']
+
+
+- name: Run a shell command and register its output as a variable
+  shell: "cat /home/ubuntu/.ssh/id_rsa_videoChat.pub"
+  register: contents
+  when:
+    - inventory_hostname in groups['My_Group']
+
+- debug: msg="{{ hostvars[groups['My_Group'][0]]['contents']['stdout'] }}"
+  when:
+    - inventory_hostname in groups['Slave']
+
+- name: paste public key to authorized_keys
+  lineinfile:
+    path: /home/ubuntu/.ssh/authorized_keys
+    line: "{{ hostvars[groups['My_Group'][0]]['contents']['stdout'] }}"
+  when:
+    - inventory_hostname in groups['Slave']

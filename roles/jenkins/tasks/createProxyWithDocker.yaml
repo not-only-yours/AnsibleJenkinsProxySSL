@@ -1,0 +1,31 @@
+- name: create folder /opt/nginx
+  ansible.builtin.file:
+    path: /opt/nginx
+    owner: 1000
+    group: 1000
+    state: directory
+    mode: '0755'
+
+- name: copy nginx config file
+  copy: src=/Users/nikita_dir/Documents/projects/NikitaAnsible/roles/jenkins/files/vhost.conf dest=/opt/nginx/vhost.conf
+
+- name: pull jenkins image
+  docker_image:
+    name: nginx:stable
+    source: pull
+
+- name: deploy nginx docker container
+  docker_container:
+    name: "nginx"
+    image: "nginx:stable"
+    detach: yes
+    ports:
+      - "80:80"
+      - "443:443"
+    networks:
+      - name: "proxy"
+
+    volumes:
+      - /opt/nginx/vhost.conf:/etc/nginx/conf.d/vhost.conf
+      - /etc/letsencrypt/live/nikitasdomain.cf/fullchain.pem:/etc/letsencrypt/live/nikitasdomain.cf/nikitasdomain.cf.crt
+      - /etc/letsencrypt/live/nikitasdomain.cf/privkey.pem:/etc/letsencrypt/live/nikitasdomain.cf/nikitasdomain.cf.key

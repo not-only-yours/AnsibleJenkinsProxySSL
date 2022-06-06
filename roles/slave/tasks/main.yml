@@ -1,0 +1,4 @@
+---
+# tasks file for slave
+- include_tasks: dockerComposeApp.yaml
+  when: inventory_hostname in groups['Slave']

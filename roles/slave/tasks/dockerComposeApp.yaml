@@ -1,0 +1,123 @@
+- name: installisation
+  apt:
+    name:
+      - certbot
+      - default-jre
+
+- name: install docker-compose
+  get_url:
+    url: https://github.com/docker/compose/releases/download/1.25.1-rc1/docker-compose-Linux-x86_64
+    dest: /usr/local/bin/docker-compose
+    mode: 'u+x,g+x'
+
+- name: add dependencies
+  shell: sudo chmod +x /usr/local/bin/docker-compose;
+
+- name: generation of serts firstFeature
+  shell: certbot certonly --standalone -d firstFeature.nikitasdomain.cf --staple-ocsp -m darty@nikitasdomain.cf --agree-tos
+
+- name: generation of serts main
+  shell: certbot certonly --standalone -d main.nikitasdomain.cf --staple-ocsp -m darty@nikitasdomain.cf --agree-tos
+
+- name: generation of serts secondFeature
+  shell: certbot certonly --standalone -d secondFeature.nikitasdomain.cf --staple-ocsp -m darty@nikitasdomain.cf --agree-tos
+
+- name: generation of serts thirdFeature
+  shell: certbot certonly --standalone -d thirdFeature.nikitasdomain.cf --staple-ocsp -m darty@nikitasdomain.cf --agree-tos
+
+#- name: copy nginx config file
+#  copy: src=/Users/nikita_dir/Documents/projects/NikitaAnsible/roles/slave/files/cloudflare.ini dest=/etc/letsencrypt/cloudflare.ini
+
+#- name: copy nginx config file
+#  copy: src=/Users/nikita_dir/Documents/projects/NikitaAnsible/roles/slave/files/cli.ini dest=/etc/letsencrypt/cli.ini
+
+
+- name: create folder /opt/application
+  ansible.builtin.file:
+    path: /opt/application
+    owner: 1000
+    group: 1000
+    state: directory
+    mode: '770'
+
+
+#- name: clone of branch
+#  ansible.builtin.git:
+#    repo: https://github.com/not-only-yours/videoAndChatApp.git
+#    dest: /opt/application
+#    version: main
+
+- name: Create a network
+  docker_network:
+    name: "my-pre-existing-network"
+
+- name: create folder /opt/nginx
+  ansible.builtin.file:
+    path: /opt/nginx
+    owner: 1000
+    group: 1000
+    state: directory
+    mode: '0755'
+
+- name: copy nginx config file
+  copy: src=/Users/nikita_dir/Documents/projects/NikitaAnsible/roles/slave/files/vhost.conf dest=/opt/nginx/origin_vhost.conf
+
+- name: copy script
+  copy: src=/Users/nikita_dir/Documents/projects/NikitaAnsible/roles/slave/files/createConfigurationOfNginx.sh dest=/opt/nginx/script.sh
+
+#- name: run script
+#  command: sh /opt/nginx/script.sh main
+
+- name: pull nginx image
+  docker_image:
+    name: nginx:stable
+    source: pull
+
+#- name: deploy nginx docker container
+#  docker_container:
+#    name: "nginx"
+#    image: "nginx:stable"
+#    detach: yes
+#    ports:
+#      - "80:80"
+#      - "443:443"
+#    networks:
+#      - name: "my-pre-existing-network"
+#
+#    volumes:
+#      - /opt/nginx/vhost.conf:/etc/nginx/conf.d/vhost.conf
+#      - /etc/letsencrypt/live/current/fullchain.pem:/etc/letsencrypt/live/current.nikitasdomain.cf/current.nikitasdomain.cf.crt
+#      - /etc/letsencrypt/live/current/privkey.pem:/etc/letsencrypt/live/current.nikitasdomain.cf/current.nikitasdomain.cf.key
+
+- name: deploy nginx docker container
+  docker_container:
+    name: "nginx"
+    image: "nginx:stable"
+    detach: yes
+    ports:
+      - "80:80"
+      - "443:443"
+    networks:
+      - name: "my-pre-existing-network"
+
+    volumes:
+      - /opt/nginx/certificates:/etc/nginx/conf.d
+      - /etc/letsencrypt:/etc/letsencrypt
+
+
+
+
+#  docker run -it --rm \
+#  -v /etc/letsencrypt:/etc/letsencrypt \
+#  -v /etc/letsencrypt/cloudflare.ini:/cloudflare.ini \
+#  -v /var/log/letsencrypt:/var/log/letsencrypt \
+#  -v  /etc/letsencrypt/cli.ini:/etc/letsencrypt/cli.ini \
+#  certbot/dns-cloudflare  \
+#  certonly \
+#  --dns-cloudflare \
+#  --dns-cloudflare-credentials="/cloudflare.ini" \
+#  --dns-cloudflare-propagation-seconds 60 \
+#  -d *.nikitasdomain.cf \
+#  -d nikitasdomain.cf
+
+

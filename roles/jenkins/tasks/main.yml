@@ -1,0 +1,6 @@
+---
+# tasks file for roles/jenkins
+- include_tasks: createSSLForProxy.yaml
+- include_tasks: createJenkinsImage.yaml
+- include_tasks: createContainerWithJenkins.yaml
+- include_tasks: createProxyWithDocker.yaml

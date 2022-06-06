@@ -1,0 +1,22 @@
+
+
+#TODO: doesn't work
+
+- name: "Get latest kubectl version"
+  command: "curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt`/bin/linux/amd64/kubectl"
+  args:
+    warn: false
+  register: latest_version
+  failed_when:  false
+  changed_when: false
+
+- name: download file and force basic auth
+  get_url:
+    url: "https://storage.googleapis.com/kubernetes-release/release/v1.24.0/bin/linux/amd64/kubectl"
+    dest: /usr/local/bin
+
+- name: Changing perm of "/bin/linux/amd64/kubectl", adding "+x"
+  file: dest=/usr/local/bin/kubectl mode=a+x
+
+
+
